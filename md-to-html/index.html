@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Markdown → HTML (CDN, single page)</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <style>
+    :root { color-scheme: light dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
+    header { padding: 12px 16px; border-bottom: 1px solid #ddd; }
+    h1 { margin: 0; font-size: 18px; }
+    main { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+    .panel { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; min-height: 40vh; }
+    .panel header { background: #f6f6f6; border-bottom: 1px solid #ddd; }
+    .panel header h2 { margin: 0; font-size: 14px; }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px; align-items: center; }
+    .controls input[type="file"] { max-width: 280px; }
+    .controls button { padding: 6px 10px; }
+
+    .dropzone { margin: 8px 16px; border: 2px dashed #bbb; border-radius: 8px; padding: 12px; text-align: center; color: #666; }
+    .dropzone.drag { border-color: #3b82f6; background: #f0f7ff; color: #1e40af; }
+
+    textarea { flex: 1; width: 100%; min-height: 300px; padding: 12px; border: none; border-top: 1px solid #eee; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    #output { flex: 1; padding: 16px; overflow: auto; }
+    #output .md { max-width: 900px; margin: 0 auto; }
+
+    /* Basic markdown styles */
+    .md h1, .md h2, .md h3 { margin-top: 1.25em; margin-bottom: 0.5em; }
+    .md p { line-height: 1.6; }
+
+
+    .md a { color: #2563eb; }
+
+
+
+    /* Print styles: white background, sensible margins */
+    @media print { 
+      body { background: white; }
+      header, .controls, .dropzone { display: none !important; }
+      main { display: block; padding: 0; }
+      #output { padding: 0; }
+      .md { max-width: none; }
+    }
+  </style>
+ 
+  <!-- markdown-it for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js" defer></script>
+  <!-- highlight.js for fenced code blocks (optional) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js" defer></script>
+   <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Markdown → HTML (client-only)</h1>
+  </header>
+  <main>
+    <section class="panel" aria-label="Input">
+      <header><h2>Input Markdown</h2></header>
+      <div class="controls">
+        <input id="file" type="file" accept=".md,.markdown,.txt" />
+        <button id="pasteBtn" type="button">Paste from Clipboard</button>
+        <button id="clearBtn" type="button">Clear</button>
+        <span id="status" aria-live="polite" style="margin-left:auto;color:#666"></span>
+      </div>
+      <div id="drop" class="dropzone" tabindex="0">Drop a .md file here or paste text into the editor below</div>
+      <textarea id="editor" placeholder="# Paste or type markdown here...\n\n- Supports file upload\n- Drag & drop files\n- Paste from clipboard\n- Renders live to HTML on the right"></textarea>
+    </section>
+
+    <section class="panel" aria-label="Output">
+      <header><h2>Rendered HTML</h2></header>
+      <div id="output"><div class="md" id="render"></div></div>
+    </section>
+  </main>
+
+  <script>
+    // Wait for CDN scripts
+    window.addEventListener('DOMContentLoaded', () => {
+      const md = window.markdownit({
+        html: false,
+        linkify: true,
+        typographer: true,
+        highlight: function (str, lang) {
+          try {
+            if (lang && window.hljs.getLanguage(lang)) {
+              return '<pre><code class="hljs">' + window.hljs.highlight(str, { language: lang }).value + '</code></pre>';
+            }
+          } catch (e) { /* ignore */ }
+          return '<pre><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+        }
+      });
+
+      const $file = document.getElementById('file');
+      const $editor = document.getElementById('editor');
+      const $render = document.getElementById('render');
+      const $drop = document.getElementById('drop');
+      const $status = document.getElementById('status');
+      const $pasteBtn = document.getElementById('pasteBtn');
+      const $clearBtn = document.getElementById('clearBtn');
+
+      function render() {
+        const src = $editor.value || '';
+        const html = md.render(src);
+        $render.innerHTML = html;
+        $status.textContent = src.length ? `${src.length.toLocaleString()} chars` : '';
+      }
+
+      // Initial render
+      render();
+
+      // Live render on input
+      $editor.addEventListener('input', render);
+
+      // File picker
+      $file.addEventListener('change', async (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const text = await f.text();
+        $editor.value = text;
+        render();
+        $status.textContent = `Loaded: ${f.name} (${f.size.toLocaleString()} bytes)`;
+      });
+
+      // Drag & drop support
+      ['dragenter','dragover'].forEach(ev => {
+        $drop.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); $drop.classList.add('drag'); });
+      });
+      ['dragleave','dragend','drop'].forEach(ev => {
+        $drop.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); $drop.classList.remove('drag'); });
+      });
+      $drop.addEventListener('drop', async (e) => {
+        const items = e.dataTransfer && (e.dataTransfer.items || []);
+        const files = e.dataTransfer && (e.dataTransfer.files || []);
+        let file = null;
+        if (items && items.length && items[0].kind === 'file') {
+          file = items[0].getAsFile();
+        } else if (files && files.length) {
+          file = files[0];
+        }
+        if (file) {
+          const text = await file.text();
+          $editor.value = text;
+          render();
+          $status.textContent = `Dropped: ${file.name} (${file.size.toLocaleString()} bytes)`;
+        } else {
+          // If user drags text/paths, try to read text
+          const txt = e.dataTransfer.getData('text');
+          if (txt) {
+            $editor.value = txt;
+            render();
+            $status.textContent = 'Dropped text';
+          }
+        }
+      });
+
+      // Paste from clipboard
+      $pasteBtn.addEventListener('click', async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            $editor.value = text;
+            render();
+            $status.textContent = 'Pasted from clipboard';
+          } else {
+            $status.textContent = 'Clipboard is empty or unavailable';
+          }
+        } catch {
+          $status.textContent = 'Clipboard permission denied';
+        }
+      });
+
+      // Clear
+      $clearBtn.addEventListener('click', () => {
+        $editor.value = '';
+        render();
+        $status.textContent = '';
+      });
+    });
+  </script>
+</body>
+</html>
