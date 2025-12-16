@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Markdown → HTML → PDF</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Optional shared styles -->
+  <link rel="stylesheet" href="../shared/styles.css" />
+  <!-- Local light theme -->
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Marked (Markdown parser) via cdnjs (UMD build) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.3.0/lib/marked.umd.min.js"
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- html2pdf.js (bundled: includes html2canvas + jsPDF) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>md-to-pdf (CDN-only)</h1>
+  </header>
+
+  <main class="grid">
+    <!-- Controls -->
+    <section class="controls">
+      <label class="file-label">
+        <span>Upload Markdown</span>
+        <input id="fileInput" type="file" accept=".md,.markdown,.txt" />
+      </label>
+
+      <div id="dropZone" class="drop-zone" tabindex="0" aria-label="Drop .md file here">
+        Drag & drop your <code>.md</code> file here (or paste text directly in the left pane)
+      </div>
+
+      <div class="buttons">
+        <button id="renderBtn" class="primary">Render HTML</button>
+        <button id="exportBtn" class="accent">Export to PDF</button>
+      </div>
+
+      <p class="hint">
+        Tip: You can paste from clipboard into the left panel. If you upload a file, we’ll keep its base name for the PDF.
+      </p>
+    </section>
+
+    <!-- Left: Markdown area -->
+    <section class="pane">
+      <h2>Markdown</h2>
+      <textarea id="mdInput" placeholder="Paste or type your Markdown here…"></textarea>
+    </section>
+
+    <!-- Right: HTML preview -->
+    <section class="pane">
+      <h2>HTML Preview</h2>
+      <article id="htmlPreview" class="preview"></article>
+    </section>
+
+    <!-- Bottom: PDF preview -->
+    <section class="pane wide">
+      <h2>PDF Preview</h2>
+      <iframe id="pdfIframe" title="PDF preview" class="pdf-frame"></iframe>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>Marked + html2pdf.js via CDN. No frameworks.</small>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Markdown → HTML → PDF</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Optional shared styles -->
+  ../shared/styles.css
+  <!-- Local light theme -->
+  ./styles.css
+
+  <!-- Marked (Markdown parser) via cdnjs (UMD build) -->
+  <!-- Marked is a fast markdown parser for browsers; use UMD for a global `marked` -->
+  https://cdnjs.cloudflare.com/ajax/libs/marked/16.3.0/lib/marked.umd.min.js</script>
+  <!-- html2pdf.js (bundled: includes html2canvas + jsPDF) -->
+  https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js</script>
+
+  <!-- OPTIONAL: PDF.js (only used if you toggle “Use PDF.js viewer”) -->
+  <!-- Core library -->
+  https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js</script>
+  <!-- Viewer helper (CSS/JS) -->
+  https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf_viewer.min.css
+  https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf_viewer.js</script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>md-to-pdf (CDN-only)</h1>
+  </header>
+
+  <main class="grid">
+    <!-- Controls -->
+    <section class="controls">
+      <label class="file-label">
+        <span>Upload Markdown</span>
+        <input id="fileInput" type="file" accept=".md,.markdown,.txt" />
+      </label>
+
+      <div id="dropZone" class="drop-zone" tabindex="0" aria-label="Drop .md file here">
+        Drag &amp; drop your <code>.md</code> file here (or paste text directly in the left pane)
+      </div>
+
+      <div class="buttons">
+        <button id="renderBtn" class="primary">Render HTML</button>
+        <button id="exportBtn" class="accent">Export to PDF</button>
+        <label class="inline">
+          <input id="usePdfJs" type="checkbox" />
+          Use PDF.js viewer
+        </label>
+        <button id="chooseFolderBtn" title="Choose output folder (File System Access API)">Choose output folder</button>
+      </div>
+
+      <p class="hint">
+        Tip: You can paste from clipboard into the left panel. If you upload a file, we’ll keep its base name for the PDF.
+      </p>
+    </section>
+
+    <!-- Left: Markdown “canvas” (editor-like area) -->
+    <section class="pane">
+      <h2>Markdown</h2>
+      <textarea id="mdInput" placeholder="Paste or type your Markdown here…"></textarea>
+    </section>
+
+    <!-- Right: HTML preview -->
+    <section class="pane">
+      <h2>HTML Preview</h2>
+      <article id="htmlPreview" class="preview"></article>
+    </section>
+
+    <!-- Bottom: PDF preview -->
+    <section class="pane wide">
+      <h2>PDF Preview</h2>
+      <!-- Default: use native viewer in an iframe -->
+      <iframe id="pdfIframe" title="PDF preview" class="pdf-frame"></iframe>
+
+      <!-- Optional: PDF.js canvas container (visible only when enabled) -->
+      <div id="pdfjsContainer" class="pdfjs-container hidden">
+        <div id="pdfjsViewer" class="pdfViewer"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>Marked + html2pdf.js via CDN; optional PDF.js viewer. No frameworks.</small>
+  </footer>
+
+  ./app.js</script>
+</body>
+</html>
