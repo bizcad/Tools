@@ -1,0 +1,84 @@
+# .gitignore for Visual Studio, .NET, and common tools
+# Build results
+bin/
+obj/
+[Bb]uild/
+[Bb]uilds/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.csproj.user
+*.pidb
+*.sublime-workspace
+*.sublime-project
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+$RECYCLE.BIN/
+
+# Visual Studio Code
+.vscode/
+.history/
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+*.TestResults/
+
+# Others
+*.vspscc
+*.vssscc
+*.dbmdl
+*.bak
+*.backup
+*.swp
+*.tmp
+*.orig
+*.rej
+*.cache
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# Local configuration
+local.settings.json
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+
+# Coverage
+coverage/
+*.coverage
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# End of .gitignore
